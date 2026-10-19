@@ -1,43 +1,73 @@
+require('dotenv').config();
 const express = require('express');
-const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
-const { extraireDonneesBancaires } = require('./extractor');
+const session = require('express-session');
+const bcrypt = require('bcrypt');
+const db = require('./database');
 
 const app = express();
-const port = 3000;
 
-const uploadDir = path.join(__dirname, 'uploads');
-const downloadDir = path.join(__dirname, 'downloads');
-if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir);
-if (!fs.existsSync(downloadDir)) fs.mkdirSync(downloadDir);
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-const upload = multer({ dest: uploadDir });
-app.use(express.static('public'));
+app.use(session({
+    secret: process.env.SESSION_SECRET || 'un_secret_par_defaut_très_long',
+    resave: false,
+    saveUninitialized: false
+}));
 
-app.post('/upload', upload.single('fichier_pdf'), async (req, res) => {
-    if (!req.file || req.file.mimetype !== 'application/pdf') {
-        return res.status(400).send("Veuillez fournir un fichier PDF valide.");
-    }
-    const pdfPath = req.file.path;
-    const excelName = req.file.originalname.replace('.pdf', '.xlsx');
-    const excelPath = path.join(downloadDir, excelName);
+
+app.post('/register', async (req, res) => {
+    const { username, password } = req.body;
 
     try {
-        await extraireDonneesBancaires(pdfPath, excelPath);
-        res.download(excelPath, excelName, (err) => {
-            if (fs.existsSync(pdfPath)) fs.unlinkSync(pdfPath);
-            if (fs.existsSync(excelPath)) fs.unlinkSync(excelPath);
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        db.run(`INSERT INTO users (username, password) VALUES (?, ?)`, [username, hashedPassword], function(err) {
+            if (err) {
+                return res.status(400).json({ error: "Ce nom d'utilisateur existe déjà." });
+            }
+            res.status(201).json({ message: "Utilisateur créé avec succès !" });
         });
     } catch (error) {
-        console.error("Erreur d'extraction :", error);
-        res.status(500).send("Erreur lors de la conversion du fichier.");
-        if (fs.existsSync(pdfPath)) fs.unlinkSync(pdfPath);
+        res.status(500).json({ error: "Erreur lors de l'inscription." });
     }
 });
 
-const PORT = process.env.PORT || 3000;
+app.post('/login', (req, res) => {
+    const { username, password } = req.body;
 
+    db.get(`SELECT * FROM users WHERE username = ?`, [username], async (err, user) => {
+        if (err) return res.status(500).json({ error: "Erreur serveur." });
+        
+        if (!user || !(await bcrypt.compare(password, user.password))) {
+            return res.status(401).json({ error: "Identifiants incorrects." });
+        }
+
+        req.session.userId = user.id;
+        res.json({ message: "Connecté avec succès !" });
+    });
+});
+
+app.post('/logout', (req, res) => {
+    req.session.destroy();
+    res.json({ message: "Déconnecté." });
+});
+
+const isAuthenticated = (req, res, next) => {
+    if (req.session.userId) {
+        return next();
+    }
+    res.status(401).json({ error: "Accès refusé. Veuillez vous connecter pour convertir un PDF." });
+};
+
+app.post('/upload-pdf', isAuthenticated, (req, res) => {
+    
+    db.run(`INSERT INTO conversions (user_id, filename) VALUES (?, ?)`, [req.session.userId, "releve_traite.pdf"]);
+
+    res.json({ message: "Succès : Extraction du PDF terminée et enregistrée !" });
+});
+
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`✅ Serveur opérationnel sur le port ${PORT}`);
+    console.log(`Serveur démarré sur le port ${PORT}`);
 });

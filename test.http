@@ -1,0 +1,20 @@
+### 1. Inscription
+POST http://localhost:3000/register
+Content-Type: application/json
+
+{
+    "username": "noa",
+    "password": "123"
+}
+
+### 2. Connexion
+POST http://localhost:3000/login
+Content-Type: application/json
+
+{
+    "username": "noa",
+    "password": "123"
+}
+
+### 3. Test de la route
+POST http://localhost:3000/upload-pdf
