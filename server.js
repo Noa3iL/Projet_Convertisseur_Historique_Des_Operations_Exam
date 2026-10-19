@@ -36,7 +36,6 @@ app.post('/upload', upload.single('fichier_pdf'), async (req, res) => {
     }
 });
 
-// On récupère le port fourni par le serveur cloud, sinon on utilise 3000 en local
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {

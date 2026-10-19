@@ -105,7 +105,6 @@ async function extraireDonneesBancaires(pdfPath, excelPath) {
                                 libelleFlottant = ""; 
                             }
                         } else {
-                            // Conditions découpées pour éviter le bug de ligne tronquée
                             const txtMin = textComplet.toLowerCase();
                             const estEnTete = txtMin.includes('solde') || 
                                               txtMin.includes('liste des opérations') || 
