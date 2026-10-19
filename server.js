@@ -36,6 +36,9 @@ app.post('/upload', upload.single('fichier_pdf'), async (req, res) => {
     }
 });
 
-app.listen(port, () => {
-    console.log(`✅ Serveur Node opérationnel sur http://localhost:${port}`);
+// On récupère le port fourni par le serveur cloud, sinon on utilise 3000 en local
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+    console.log(`✅ Serveur opérationnel sur le port ${PORT}`);
 });
