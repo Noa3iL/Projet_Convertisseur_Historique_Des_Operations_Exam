@@ -1,3 +1,5 @@
+const multer = require('multer');
+const upload = multer({ dest: 'uploads/' });
 require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
@@ -64,14 +66,18 @@ const isAuthenticated = (req, res, next) => {
     res.status(401).json({ error: "Accès refusé. Veuillez vous connecter pour convertir un PDF." });
 };
 
-app.post('/upload-pdf', isAuthenticated, (req, res) => {
+app.post('/upload-pdf', isAuthenticated, upload.single('pdf'), (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({ error: "Aucun fichier n'a été envoyé." });
+    }
+
+    db.run(`INSERT INTO conversions (user_id, filename) VALUES (?, ?)`, [req.session.userId, req.file.originalname]);
+
+    const cheminFichierExcel = __dirname + '/resultat.xlsx'; 
     
-    db.run(`INSERT INTO conversions (user_id, filename) VALUES (?, ?)`, [req.session.userId, "releve_traite.pdf"]);
-
-    res.json({ message: "Succès : Extraction du PDF terminée et enregistrée !" });
-});
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Serveur démarré sur le port ${PORT}`);
+    res.download(cheminFichierExcel, 'Releve_Converti.xlsx', (err) => {
+        if (err) {
+            console.error("Erreur lors de l'envoi du fichier au navigateur :", err);
+        }
+    });
 });
