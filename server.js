@@ -16,6 +16,9 @@ app.use(session({
     saveUninitialized: false
 }));
 
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/index.html');
+});
 
 app.post('/register', async (req, res) => {
     const { username, password } = req.body;

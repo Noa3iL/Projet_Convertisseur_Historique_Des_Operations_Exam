@@ -17,7 +17,6 @@
 
     <h2>Outil d'Extraction Bancaire</h2>
 
-    <!-- Formulaire de Connexion -->
     <div id="loginSection" class="card">
         <h3>Authentification requise</h3>
         <input type="text" id="username" placeholder="Nom d'utilisateur">
@@ -26,7 +25,6 @@
         <p id="message"></p>
     </div>
 
-    <!-- Interface Outil (Cachée par défaut) -->
     <div id="toolSection" class="card hidden">
         <h3 style="color: #4caf50;">Accès Autorisé</h3>
         <p>Bienvenue. Vous pouvez lancer l'extraction.</p>
@@ -35,7 +33,6 @@
     </div>
 
     <script>
-        // Fonction pour se connecter
         async function login() {
             const user = document.getElementById('username').value;
             const pass = document.getElementById('password').value;
@@ -55,17 +52,15 @@
             }
         }
 
-        // Fonction pour déclencher ton outil
         async function uploadPdf() {
             const response = await fetch('/upload-pdf', { method: 'POST' });
             const data = await response.json();
             alert(data.message || data.error);
         }
 
-        // Fonction pour se déconnecter
         async function logout() {
             await fetch('/logout', { method: 'POST' });
-            location.reload(); // Recharge la page
+            location.reload();
         }
     </script>
 
