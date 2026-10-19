@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Extracteur PDF - Accès Sécurisé</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #1e1e1e; color: #fff; display: flex; flex-direction: column; align-items: center; margin-top: 50px; }
+        .card { background: #2d2d2d; padding: 20px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); width: 300px; margin-bottom: 20px; }
+        input { width: 90%; padding: 10px; margin: 10px 0; border: none; border-radius: 4px; }
+        button { width: 100%; padding: 10px; background: #007acc; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        button:hover { background: #005f9e; }
+        .hidden { display: none; }
+        #message { margin-top: 15px; text-align: center; font-size: 0.9em; color: #ffeb3b; }
+    </style>
+</head>
+<body>
+
+    <h2>Outil d'Extraction Bancaire</h2>
+
+    <!-- Formulaire de Connexion -->
+    <div id="loginSection" class="card">
+        <h3>Authentification requise</h3>
+        <input type="text" id="username" placeholder="Nom d'utilisateur">
+        <input type="password" id="password" placeholder="Mot de passe">
+        <button onclick="login()">Se connecter</button>
+        <p id="message"></p>
+    </div>
+
+    <!-- Interface Outil (Cachée par défaut) -->
+    <div id="toolSection" class="card hidden">
+        <h3 style="color: #4caf50;">Accès Autorisé</h3>
+        <p>Bienvenue. Vous pouvez lancer l'extraction.</p>
+        <button onclick="uploadPdf()">Lancer l'extraction PDF -> Excel</button>
+        <button onclick="logout()" style="background: #d32f2f; margin-top: 15px;">Se déconnecter</button>
+    </div>
+
+    <script>
+        // Fonction pour se connecter
+        async function login() {
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
+            const msg = document.getElementById('message');
+
+            const response = await fetch('/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: user, password: pass })
+            });
+
+            if (response.ok) {
+                document.getElementById('loginSection').classList.add('hidden');
+                document.getElementById('toolSection').classList.remove('hidden');
+            } else {
+                msg.innerText = "Identifiants incorrects.";
+            }
+        }
+
+        // Fonction pour déclencher ton outil
+        async function uploadPdf() {
+            const response = await fetch('/upload-pdf', { method: 'POST' });
+            const data = await response.json();
+            alert(data.message || data.error);
+        }
+
+        // Fonction pour se déconnecter
+        async function logout() {
+            await fetch('/logout', { method: 'POST' });
+            location.reload(); // Recharge la page
+        }
+    </script>
+
+</body>
+</html>

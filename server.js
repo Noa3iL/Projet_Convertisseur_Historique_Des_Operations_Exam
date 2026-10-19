@@ -8,6 +8,7 @@ const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static(__dirname));
 
 app.use(session({
     secret: process.env.SESSION_SECRET || 'un_secret_par_defaut_très_long',
