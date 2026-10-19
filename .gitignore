@@ -3,3 +3,7 @@ node_modules/
 *.xlsx
 downloads/
 uploads/
+node_modules/
+.env
+database.sqlite
+*.xlsx
