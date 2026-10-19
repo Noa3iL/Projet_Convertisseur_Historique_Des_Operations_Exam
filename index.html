@@ -27,10 +27,12 @@
         <p id="message"></p>
     </div>
 
-    <div id="toolSection" class="card hidden">
+   <div id="toolSection" class="card hidden">
         <h3 style="color: #4caf50;">Accès Autorisé</h3>
-        <p>Bienvenue. Vous pouvez lancer l'extraction.</p>
-        <button onclick="uploadPdf()">Lancer l'extraction PDF -> Excel</button>
+        <p>Sélectionnez votre relevé bancaire (PDF) :</p>
+        <!-- Le champ crucial pour choisir le PDF -->
+        <input type="file" id="pdfFile" accept="application/pdf" style="background: #fff; color: #000; border-radius: 4px;">
+        <button onclick="uploadPdf()" id="extractBtn">Lancer l'extraction PDF -> Excel</button>
         <button onclick="logout()" style="background: #d32f2f; margin-top: 15px;">Se déconnecter</button>
     </div>
 
@@ -76,9 +78,48 @@
         }
 
         async function uploadPdf() {
-            const response = await fetch('/upload-pdf', { method: 'POST' });
-            const data = await response.json();
-            alert(data.message || data.error);
+            const fileInput = document.getElementById('pdfFile');
+            const file = fileInput.files[0];
+            const btn = document.getElementById('extractBtn');
+
+            if (!file) {
+                alert("Veuillez d'abord sélectionner un fichier PDF !");
+                return;
+            }
+
+            // Préparation du fichier pour l'envoi
+            const formData = new FormData();
+            formData.append('pdf', file); // 'pdf' doit correspondre au nom attendu par ton serveur
+
+            try {
+                btn.innerText = "Extraction en cours...";
+                btn.style.background = "#ff9800";
+
+                const response = await fetch('/upload-pdf', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    // Force le téléchargement du fichier Excel reçu
+                    const blob = await response.blob();
+                    const downloadUrl = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = downloadUrl;
+                    a.download = "Resultat_Extraction.xlsx";
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    alert("Extraction réussie ! L'Excel a été téléchargé.");
+                } else {
+                    alert("Erreur lors de l'extraction du fichier.");
+                }
+            } catch (err) {
+                alert("Erreur de communication avec le serveur.");
+            } finally {
+                btn.innerText = "Lancer l'extraction PDF -> Excel";
+                btn.style.background = "#007acc";
+            }
         }
 
         async function logout() {
