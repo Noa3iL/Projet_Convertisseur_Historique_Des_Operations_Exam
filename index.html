@@ -22,6 +22,8 @@
         <input type="text" id="username" placeholder="Nom d'utilisateur">
         <input type="password" id="password" placeholder="Mot de passe">
         <button onclick="login()">Se connecter</button>
+        <!-- Le nouveau bouton d'inscription est ici -->
+        <button onclick="register()" style="background: #555; margin-top: 10px;">Créer mon compte</button>
         <p id="message"></p>
     </div>
 
@@ -33,6 +35,26 @@
     </div>
 
     <script>
+        async function register() {
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
+            const msg = document.getElementById('message');
+
+            const response = await fetch('/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: user, password: pass })
+            });
+
+            if (response.ok) {
+                msg.style.color = "#4caf50";
+                msg.innerText = "Compte créé avec succès ! Cliquez sur Se connecter.";
+            } else {
+                msg.style.color = "#f44336";
+                msg.innerText = "Erreur ou nom d'utilisateur déjà pris.";
+            }
+        }
+
         async function login() {
             const user = document.getElementById('username').value;
             const pass = document.getElementById('password').value;
@@ -48,6 +70,7 @@
                 document.getElementById('loginSection').classList.add('hidden');
                 document.getElementById('toolSection').classList.remove('hidden');
             } else {
+                msg.style.color = "#f44336";
                 msg.innerText = "Identifiants incorrects.";
             }
         }
