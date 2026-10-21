@@ -108,7 +108,10 @@ async function extraireDonneesBancaires(pdfPath, excelPath) {
                             const txtMin = textComplet.toLowerCase();
                             const estEnTete = txtMin.includes('solde') || 
                                               txtMin.includes('liste des opérations') || 
-                                              txtMin.includes('téléchargement');
+                                              txtMin.includes('téléchargement') ||
+                                              txtMin.includes('date valeur') ||
+                                              txtMin.includes('débit euros');
+                                              
                             const aUnMontant = /([\d\s]+,\d{2})$/.test(textComplet);
                             
                             if (!estEnTete && !aUnMontant) {
