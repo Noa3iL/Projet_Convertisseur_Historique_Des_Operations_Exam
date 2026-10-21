@@ -88,3 +88,8 @@ app.post('/upload-pdf', isAuthenticated, upload.single('pdf'), async (req, res) 
         res.status(500).send("Une erreur est survenue pendant la conversion.");
     }
 });
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`✅ Serveur opérationnel sur le port ${PORT}`);
+});
