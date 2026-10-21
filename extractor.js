@@ -104,13 +104,18 @@ async function extraireDonneesBancaires(pdfPath, excelPath) {
                                 
                                 libelleFlottant = ""; 
                             }
-                        } else {
-                            const txtMin = textComplet.toLowerCase();
+                       } else {
+                            const txtMin = textComplet.toLowerCase().trim().replace(/\s+/g, ' ');
+                            
                             const estEnTete = txtMin.includes('solde') || 
                                               txtMin.includes('liste des opérations') || 
                                               txtMin.includes('téléchargement') ||
                                               txtMin.includes('date valeur') ||
-                                              txtMin.includes('débit euros');
+                                              txtMin.includes('débit') ||
+                                              txtMin.includes('crédit') ||
+                                              txtMin === 'date' ||
+                                              txtMin === 'libellé' ||
+                                              txtMin === 'euros';
                                               
                             const aUnMontant = /([\d\s]+,\d{2})$/.test(textComplet);
                             
