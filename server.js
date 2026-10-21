@@ -66,18 +66,25 @@ const isAuthenticated = (req, res, next) => {
     res.status(401).json({ error: "Accès refusé. Veuillez vous connecter pour convertir un PDF." });
 };
 
-app.post('/upload-pdf', isAuthenticated, upload.single('pdf'), (req, res) => {
+app.post('/upload-pdf', isAuthenticated, upload.single('pdf'), async (req, res) => {
     if (!req.file) {
         return res.status(400).json({ error: "Aucun fichier n'a été envoyé." });
     }
 
     db.run(`INSERT INTO conversions (user_id, filename) VALUES (?, ?)`, [req.session.userId, req.file.originalname]);
 
-    const cheminFichierExcel = __dirname + '/resultat.xlsx'; 
-    
-    res.download(cheminFichierExcel, 'Releve_Converti.xlsx', (err) => {
-        if (err) {
-            console.error("Erreur lors de l'envoi du fichier au navigateur :", err);
-        }
-    });
+    try {
+        const cheminFichierExcel = __dirname + '/resultat.xlsx';
+
+        await extraireDonneesBancaires(req.file.path, cheminFichierExcel); 
+
+        res.download(cheminFichierExcel, 'Releve_Converti.xlsx', (err) => {
+            if (err) {
+                console.error("Erreur lors de l'envoi du fichier au navigateur :", err);
+            }
+        });
+    } catch (error) {
+        console.error("Erreur de conversion :", error);
+        res.status(500).send("Une erreur est survenue pendant la conversion.");
+    }
 });
