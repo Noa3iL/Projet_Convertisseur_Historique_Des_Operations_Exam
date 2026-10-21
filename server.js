@@ -1,5 +1,11 @@
+const fs = require('fs');
 const multer = require('multer');
-const upload = multer({ dest: 'uploads/' });
+
+const uploadDir = __dirname + '/uploads/';
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir);
+}
+const upload = multer({ dest: uploadDir });
 require('dotenv').config();
 const { extraireDonneesBancaires } = require('./extractor');
 const express = require('express');
