@@ -1,6 +1,7 @@
 const multer = require('multer');
 const upload = multer({ dest: 'uploads/' });
 require('dotenv').config();
+const { extraireDonneesBancaires } = require('./extractor');
 const express = require('express');
 const session = require('express-session');
 const bcrypt = require('bcrypt');

@@ -87,9 +87,8 @@
                 return;
             }
 
-            // Préparation du fichier pour l'envoi
             const formData = new FormData();
-            formData.append('pdf', file); // 'pdf' doit correspondre au nom attendu par ton serveur
+            formData.append('pdf', file);
 
             try {
                 btn.innerText = "Extraction en cours...";
@@ -101,7 +100,6 @@
                 });
 
                 if (response.ok) {
-                    // Force le téléchargement du fichier Excel reçu
                     const blob = await response.blob();
                     const downloadUrl = window.URL.createObjectURL(blob);
                     const a = document.createElement('a');
