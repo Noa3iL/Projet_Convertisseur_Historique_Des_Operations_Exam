@@ -22,7 +22,6 @@
         <input type="text" id="username" placeholder="Nom d'utilisateur">
         <input type="password" id="password" placeholder="Mot de passe">
         <button onclick="login()">Se connecter</button>
-        <!-- Le nouveau bouton d'inscription est ici -->
         <button onclick="register()" style="background: #555; margin-top: 10px;">Créer mon compte</button>
         <p id="message"></p>
     </div>
@@ -30,7 +29,6 @@
    <div id="toolSection" class="card hidden">
         <h3 style="color: #4caf50;">Accès Autorisé</h3>
         <p>Sélectionnez votre relevé bancaire (PDF) :</p>
-        <!-- Le champ crucial pour choisir le PDF -->
         <input type="file" id="pdfFile" accept="application/pdf" style="background: #fff; color: #000; border-radius: 4px;">
         <button onclick="uploadPdf()" id="extractBtn">Lancer l'extraction PDF -> Excel</button>
         <button onclick="logout()" style="background: #d32f2f; margin-top: 15px;">Se déconnecter</button>
@@ -125,6 +123,6 @@
             location.reload();
         }
     </script>
-
+test
 </body>
 </html>
